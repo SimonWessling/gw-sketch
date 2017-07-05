@@ -39,11 +39,11 @@ var sketchModule = (function ()
 			$('<button type="button" class="controls">Laden</button>').appendTo('#controls')
 				.on('click',load);
 			$('<button type="button" class="controls">Speichern</button>').appendTo('#controls')
-				.on('click',save);
+				.on('click', function(){ return save()});
 			$('<button type="button" class="controls">Speichern unter</button>').appendTo('#controls')
-				.on('click',function(){ return save(true)});
+				.on('click', function(){ return save(true)});
 			$('<button type="button" class="controls">Exportieren</button>').appendTo('#controls')
-				.on('click',function(){ return exportAs('png')});
+				.on('click', function(){ return exportAs('png')});
 		}
 	}
 	
