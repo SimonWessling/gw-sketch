@@ -24,6 +24,7 @@ var sketchModule = (function ()
 	var currentSnapshot = null;
 	var currentSnapshotName = null;
 	var lc = null;
+	var dragged = null;
 	
 	$(function() {
 		init();
@@ -44,7 +45,48 @@ var sketchModule = (function ()
 				.on('click', function(){ return save(true)});
 			$('<button type="button" class="controls">Exportieren</button>').appendTo('#controls')
 				.on('click', function(){ return exportAs('png')});
+			
+			
 		}
+		
+		var img = document.createElement('img');
+		img.src = 'http://www.animaatjes.de/cliparts/cartoons/lucky-luke/clipart_lucky-luke_animaatjes-23.jpg';
+		img.id = 'luckyLuke';
+		$('body').append(img);
+		
+		// enable drag and drop to canvas
+		$('#lc')
+			.on('dragover', dragAndDropHelpers.onDragover)
+			.on('drop', function(e) {
+				var dropped = dragAndDropHelpers.getDroppedObject(e);
+				lc.saveShape(LC.createShape('Image', dropped));
+			});
+		
+		$('#luckyLuke')
+		.on('dragstart', dragAndDropHelpers.getDraggedObject)
+		
+//		$('#dropzone')
+//		.on('dragstart', dragAndDropHelpers.getDraggedObject)
+//		.on('dragenter', function(event){
+//			$('#dropzone').addClass('dragover');
+//		})
+//		.on('dragover', function(event){
+//			event.preventDefault();})
+//		.on('dragleave', function (event) {
+//			$('#dropzone').removeClass('dragover');
+//		})
+//		.on('drop', dropzoneDrop);
+//		
+	}
+	
+	function dropzoneDrop(event) 
+	{
+		event.preventDefault();
+		event.stopPropagation();
+		
+		var img = $(new Image());
+		img.attr('src', 'http://www.animaatjes.de/cliparts/cartoons/lucky-luke/clipart_lucky-luke_animaatjes-23.jpg');
+		$('#dropzone').html(img).addClass('dropped');
 	}
 	
 	/*

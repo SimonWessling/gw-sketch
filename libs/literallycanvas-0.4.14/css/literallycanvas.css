@@ -56,11 +56,15 @@
 	position:absolute
 }
 .literally .lc-picker{
-	top:0;left:0;bottom:0;width:61px;background-color:#e6e6e6
+	top:0;
+	left:0;
+	bottom:0;
+	width:61px;
+	background-color:#e6e6e6;
 }.literally .lc-drawing{
 	right:0;left:0;bottom:0;left:0}
 	.literally .lc-drawing>*{position:absolute;top:0;right:0;bottom:0;left:0}
-	.literally .lc-drawing.with-gui{right:0;left:61px;cursor:default}
+	.literally .lc-drawing.with-gui{right:0;/* left:61px; */cursor:default;}
 	.literally .lc-drawing.with-gui .polygon-toolbar{top:auto;height:31px}
 	.literally .lc-drawing.with-gui .polygon-toolbar .polygon-toolbar-button{float:left}
 	.literally .lc-drawing.with-gui .text-tool-input:focus{outline:none}

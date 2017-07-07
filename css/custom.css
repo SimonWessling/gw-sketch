@@ -8,7 +8,40 @@
   position: relative;
 }
 
+#controls {
+	display: table;
+	margin: auto;
+}
 button.controls {
-	margin: 5px 5px 5px 0px;
+	margin: 5px 3px;
 	padding: 3px;
+}
+
+#dropzone {
+	height: 200px;
+	line-height: 200px;
+	background-color: #e6e6e6;
+	border-radius: 5px;
+	border: 2px dashed;
+	border-color: #555;
+	padding: 10px;
+	text-align: center;
+}
+
+#dropzone span {
+	vertical-align: middle;
+	display: inline-block;
+	color: #444;
+	line-height: normal;
+}
+
+div #dropzone.dropped {
+	padding: 0;
+	text-align: left;
+}
+
+div #dropzone.dragover {
+	background-color: #fff;
+	border: 2px dashed;
+	border-color: #555;
 }
