@@ -31,7 +31,8 @@ var sketchModule = (function ()
 	});
 
 	/*
-	 * Initializes the literallyCanvas object and the extra buttons (if standalone)
+	 * Initializes the literallyCanvas object, enables drag & drop functionality
+	 * and inserts extra buttons for saving etc. if the tool is used as standalone.
 	 */
 	function init() 
 	{
@@ -46,48 +47,21 @@ var sketchModule = (function ()
 			$('<button type="button" class="controls">Exportieren</button>').appendTo('#controls')
 				.on('click', function(){ return exportAs('png')});
 			
-			
 		}
 		
-		var img = document.createElement('img');
-		img.src = 'http://www.animaatjes.de/cliparts/cartoons/lucky-luke/clipart_lucky-luke_animaatjes-23.jpg';
-		img.id = 'luckyLuke';
-		$('body').append(img);
-		
-		// enable drag and drop to canvas
+		// enable drag and drop support 
 		$('#lc')
 			.on('dragover', dragAndDropHelpers.onDragover)
-			.on('drop', function(e) {
-				var dropped = dragAndDropHelpers.getDroppedObject(e);
-				lc.saveShape(LC.createShape('Image', dropped));
+			.on('drop', function(event) {
+				event.preventDefault();
+				var offsets = dragAndDropHelpers.calculateTargetOffsets(event);
+				dragAndDropHelpers.makeImageFromEvent(event, function(img) {
+					lc.saveShape(LC.createShape('Image', {x:offsets.x, y:offsets.y, image:img}));
+				});
 			});
-		
-		$('#luckyLuke')
-		.on('dragstart', dragAndDropHelpers.getDraggedObject)
-		
-//		$('#dropzone')
-//		.on('dragstart', dragAndDropHelpers.getDraggedObject)
-//		.on('dragenter', function(event){
-//			$('#dropzone').addClass('dragover');
-//		})
-//		.on('dragover', function(event){
-//			event.preventDefault();})
-//		.on('dragleave', function (event) {
-//			$('#dropzone').removeClass('dragover');
-//		})
-//		.on('drop', dropzoneDrop);
-//		
 	}
 	
-	function dropzoneDrop(event) 
-	{
-		event.preventDefault();
-		event.stopPropagation();
-		
-		var img = $(new Image());
-		img.attr('src', 'http://www.animaatjes.de/cliparts/cartoons/lucky-luke/clipart_lucky-luke_animaatjes-23.jpg');
-		$('#dropzone').html(img).addClass('dropped');
-	}
+
 	
 	/*
 	 * Wraps the logic of persisting snapshots by getting a file name if necessary
