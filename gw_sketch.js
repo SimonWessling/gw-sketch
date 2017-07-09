@@ -2,6 +2,7 @@ var sketchModule = (function ()
 {
 	/******************************** Configurable options *****************************************************/
 	var isStandalone = true;
+	var enableDropzone = true;
 	var lcConfig = {
 //			onInit:				
 					imageURLPrefix: 	'libs/literallycanvas-0.4.14/img',
@@ -44,24 +45,23 @@ var sketchModule = (function ()
 				.on('click', function(){ return save()});
 			$('<button type="button" class="controls">Speichern unter</button>').appendTo('#controls')
 				.on('click', function(){ return save(true)});
-			$('<button type="button" class="controls">Exportieren</button>').appendTo('#controls')
+			$('<button type="button" class="controls">Exportieren</button>').appendTo('#cont	rols')
 				.on('click', function(){ return exportAs('png')});
 			
 		}
-		
-		// enable drag and drop support 
-		$('#lc')
-			.on('dragover', dragAndDropHelpers.onDragover)
-			.on('drop', function(event) {
-				event.preventDefault();
-				var offsets = dragAndDropHelpers.calculateTargetOffsets(event);
-				dragAndDropHelpers.makeImageFromEvent(event, function(img) {
-					lc.saveShape(LC.createShape('Image', {x:offsets.x, y:offsets.y, image:img}));
-				});
-			});
-	}
 	
-
+		// init drag and drop support
+		var dropTarget = $('#lc');
+		var dropHandler = function(droppedImage) {
+			lc.saveShape(LC.createShape('Image', droppedImage));
+		};
+		if (enableDropzone) {
+			var dropzoneParent = $('.lc-container');
+			DragAndDrop.init(true, dropzoneParent, dropTarget, dropHandler)
+		} else {
+			DragAndDrop.init(false, null, dropTarget, dropHandler);
+		}
+	}
 	
 	/*
 	 * Wraps the logic of persisting snapshots by getting a file name if necessary
@@ -152,7 +152,6 @@ var sketchModule = (function ()
 		}
 	}
 	
-	/******************************** "Public" API ********************************************/
 	return {
 		load : load,
 		save : save,
