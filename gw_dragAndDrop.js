@@ -13,7 +13,6 @@ var DragAndDrop = (function()
 {	
 	var enableDropzone = true;
 	var dropZoneHtml = '<div id="dropzoneOverlay"></div><span>Ziehen Sie ein Bild per Drag &amp; Drop hierher, um es anschlie&szlig;end in die Skizze einf&uuml;gen zu k&ouml;nnen</span>';
-	var defaultHeight = '200px'
 
 	var imageWrapper = null;
 	var offsetCorrection = null;
@@ -143,7 +142,7 @@ var DragAndDrop = (function()
 		$('#dropzone')
 			.html(dropZoneHtml)
 			.removeClass('dropped')
-			.css('height', defaultHeight)
+			.css('height', '')
 			.on('dragstart', setImageWrapper);
 
 		// register handlers

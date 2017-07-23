@@ -39,6 +39,9 @@ var sketchModule = (function ()
 		lc = LC.init($('#lc')[0],lcConfig);
 		fileInput = $('#file-input');
 		if (isStandalone) {
+			var checked = showBackgroundInitially ? 'checked="checked"' : '';
+			$('<label>Raster anzeigen: <input type="checkbox" name="showBg" '+checked+'></label>').appendTo('#controls')
+				.on('change', toggleBackground);
 			$('<button type="button" class="controls">Laden</button>').appendTo('#controls')
 				.on('click', function(){fileInput.trigger('click');}); // forward to file input
 			$('<button type="button" class="controls">Speichern unter</button>').appendTo('#controls')
@@ -213,20 +216,14 @@ var sketchModule = (function ()
 		var active = 0;
 		return function() {
 			if(active) {
-				//deactivate background: find bg shape again and remove from array
-				var shapes = lc.shapes;
-				for(index in shapes) {
-					if (shapes[index].id == bgShape.id) {
-						shapes.splice(index, 1);
-						lc.rerender(shapes);
-						console.log(lc.shapes);
-						break;
-					}
-				}
+				//deactivate background
+				lc.backgroundShapes = [];
+				lc.repaintLayer('background');
 				active = (active+1)%2;
 			}else {
 				//activate
-				lc.saveShape(bgShape);
+				lc.backgroundShapes = [bgShape];
+				lc.repaintLayer('background');
 				active = (active+1)%2;
 			}
 		}

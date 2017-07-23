@@ -5,8 +5,8 @@
 }
 .literally {
   	width: 100%;
-  	height: 100%;
-	min-height: 650px;
+  	height: 80vh;
+	min-height: 600px;
   	position: relative;
 }
 #controls {
@@ -19,8 +19,9 @@ button.controls {
 }
 #dropzone {
 	position: relative;
-	height: 200px;
-	line-height: 200px;
+	height: 20vh;
+	min-height: 200px;
+	line-height: 20vh;
 	background-color: #e6e6e6;
 	border-radius: 5px;
 	border: 2px dashed;
