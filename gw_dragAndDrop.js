@@ -198,7 +198,7 @@ var DragAndDrop = (function()
 	}
 
 	return {
-		init : init,
+		init:init
 	}
 })();
 	

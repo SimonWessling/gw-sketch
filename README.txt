@@ -1,6 +1,5 @@
 Integration:
 - Adapt page title
-- Adapt dependencies:
-	 jQuery-Path
-	 literallycanvas
+
 - When changing the size of the lc-container, also adapt height in input#inputOverlay
+- Only use literally canvas library as is, since the source code was modified!
