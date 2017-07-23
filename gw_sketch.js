@@ -3,6 +3,7 @@ var sketchModule = (function ()
 	/******************************** Configurable options *****************************************************/
 	var isStandalone = true;
 	var enableDropzone = true;
+	var showBackgroundInitially = 0;
 	var lcConfig = {
 					imageURLPrefix: 	'libs/literallycanvas-0.4.14/img',
 					backgroundColor:	'#fff',
@@ -46,6 +47,10 @@ var sketchModule = (function ()
 				.on('click', onExport);
 			$('<label class="controls">Format: <select name="format" size="1"><option value=".png">PNG</option><option value=".svg">SVG</option></select></label>')
 				.appendTo('#controls');
+		}
+
+		if (showBackgroundInitially) {
+			toggleBackground();
 		}
 		
 		// Set up listeners for the input element.
@@ -201,7 +206,31 @@ var sketchModule = (function ()
 		return currentSnapshotName;
 	}
 	
-
+	var toggleBackground = (function() {
+		var bgImage = new Image(); 
+		bgImage.src = 'images/raster.jpg';
+		var bgShape = LC.createShape('Image', {x: 0, y: 0, image: bgImage, scale: 1});
+		var active = 0;
+		return function() {
+			if(active) {
+				//deactivate background: find bg shape again and remove from array
+				var shapes = lc.shapes;
+				for(index in shapes) {
+					if (shapes[index].id == bgShape.id) {
+						shapes.splice(index, 1);
+						lc.rerender(shapes);
+						console.log(lc.shapes);
+						break;
+					}
+				}
+				active = (active+1)%2;
+			}else {
+				//activate
+				lc.saveShape(bgShape);
+				active = (active+1)%2;
+			}
+		}
+	})();
 	
 	return {
 		getSnapshotAs : getSnapshotAs

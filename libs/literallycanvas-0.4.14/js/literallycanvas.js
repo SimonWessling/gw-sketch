@@ -737,7 +737,6 @@ module.exports = LiterallyCanvas = (function() {
     this.setShapesInProgress([]);
     this.execute(new actions.ClearAction(this, oldShapes, newShapes), false);
     this.repaintLayer('main');
-sdfsd
   };
 
   LiterallyCanvas.prototype.execute = function(action) {
