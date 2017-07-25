@@ -4609,6 +4609,11 @@ ColorWell = React.createClass({
       max: 1,
       step: 0.01,
       value: this.state.alpha,
+	  onMouseUp: (function(_this) {
+        return function(e) {
+          return _this.setAlpha(parseFloat(e.target.value));
+        };
+      })(this),
       onChange: (function(_this) {
         return function(e) {
           return _this.setAlpha(parseFloat(e.target.value));
@@ -4620,6 +4625,11 @@ ColorWell = React.createClass({
       max: 100,
       value: this.state.sat,
       max: 100,
+	  onMouseUp: (function(_this) {
+        return function(e) {
+          return _this.setSat(parseInt(e.target.value, 10));
+        };
+      })(this),
       onChange: (function(_this) {
         return function(e) {
           return _this.setSat(parseInt(e.target.value, 10));

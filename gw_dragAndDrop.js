@@ -49,6 +49,42 @@ var DragAndDrop = (function()
 				event.preventDefault();
 				onTargetDrop(event, targetDropHandler);
 			});
+			
+		// disable drop for other elements
+		onBodyDropPreventDefault();
+	}
+	
+	/**
+	 * Helper function to set up or restore the initial configuration of the dropzone
+	 * (e.g. on initialising this module or after the image was dropped elsewhere).
+	 */
+	function initDropzone()
+	{
+		$('#dropzone')
+			.html(dropZoneHtml)
+			.removeClass('dropped')
+			.removeClass('dragover')
+			.css('height', defaultHeight)
+			.on('dragstart', setImageWrapper);
+		$('#dropzoneOverlay')
+			.html('')
+			.removeClass('dropped')
+			.removeClass('dragover');
+		// register handlers
+		$('#dropzoneOverlay')
+			.on('dragenter', function(event){
+				event.preventDefault();
+				$('#dropzone').addClass('dragover');
+			})
+			.on('dragover', onDragover)
+			.on('dragleave', function(event) {
+				event.preventDefault();
+				$('#dropzone').removeClass('dragover');
+			})
+			.on('drop', function(event) {
+				event.preventDefault();
+				onDropzoneDrop(event);
+			});
 	}
 		
 	/**
@@ -79,14 +115,21 @@ var DragAndDrop = (function()
 	}
 	
 	/**
-	 * Imports the image from the event and inserts it into the dropzone.
+	 * Imports the image from the event and inserts it into the dropzone. If the dropped object
+	 * is not an image, rejects the drop and resets the dropzone.
 	 */
 	function onDropzoneDrop(event)
 	{
 		event.preventDefault();
-		makeImageFromEvent(event, function(img) {
-			setDropzoneImg(img);
-		});
+		//make sure it's an image
+		if (event.originalEvent.dataTransfer.files[0].type.match(/image.*/)) {
+			makeImageFromEvent(event, function(img) {
+				setDropzoneImg(img);
+			});
+		}else {
+			initDropzone();
+			// TODO user feedback: not an image
+		}
 	}
 	
 	/**
@@ -116,7 +159,7 @@ var DragAndDrop = (function()
 				// start reading in
 				reader.readAsDataURL(imgFile)
 			} else {
-				// TODO user feedback: not an image
+				return false;
 			}
 		}
 	}
@@ -133,37 +176,6 @@ var DragAndDrop = (function()
 			.removeClass('dragover')
 			.addClass('dropped')
 			.css('height', img.height) // TODO or set img height to fit into dropzone while preserving original size info
-	}
-	
-	/**
-	 * Helper function to set up or restore the initial configuration of the dropzone
-	 * (e.g. on initialising this module or after the image was dropped elsewhere).
-	 */
-	function initDropzone()
-	{
-		$('#dropzone')
-			.html(dropZoneHtml)
-			.removeClass('dropped')
-			.css('height', defaultHeight)
-			.on('dragstart', setImageWrapper);
-		$('#dropzoneOverlay')
-			.html('')
-			.removeClass('dropped');
-		// register handlers
-		$('#dropzoneOverlay')
-			.on('dragenter', function(event){
-				event.preventDefault();
-				$('#dropzone').addClass('dragover');
-			})
-			.on('dragover', onDragover)
-			.on('dragleave', function(event) {
-				event.preventDefault();
-				$('#dropzone').removeClass('dragover');
-			})
-			.on('drop', function(event) {
-				event.preventDefault();
-				onDropzoneDrop(event);
-			});
 	}
 	
 	/**
@@ -198,6 +210,19 @@ var DragAndDrop = (function()
 	{
 		event.preventDefault();
 		// TODO prevent shrinking of "ghost" image or mark borders of current drop position or set ghost to corner
+	}
+	
+	/**
+	 * To prevent the browser from opening an image when it is (accidentally) dropped outside of the dropzone,
+	 * disable drop on body and document.
+	 */
+	function onBodyDropPreventDefault(){
+		$('body').on('dragover drop', function(e) { e.preventDefault(); });
+		//$(document).on('draginit dragstart dragover dragend drag drop', function(e) {
+		$(document).on('dragover dragend drop', function(e) {
+			e.stopPropagation();
+			e.preventDefault();
+		});
 	}
 
 	return {

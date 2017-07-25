@@ -20,7 +20,6 @@ var sketchModule = (function ()
 	/**********************************************************************************************************/
 	
 	var currentSnapshot = null;
-	var currentSnapshotName = null;
 	var lc = null;
 	var fileInput = null;
 	var dragged = null;
@@ -81,6 +80,12 @@ var sketchModule = (function ()
 		} else {
 			DragAndDrop.init(false, null, dropTarget, dropHandler);
 		}
+		// disallow drop on other elements
+		/*document.body.ondragstart= preventDrop;
+		document.body.ondrop=preventDrop;
+		$('body').on('drop', preventDrop);
+		window.ondrop=preventDrop;
+		window.addEventListener("drop", preventDrop); */
 		
 	}
 	
@@ -117,6 +122,8 @@ var sketchModule = (function ()
 	
 	function onExport()
 	{
+		console.log(lc);
+		renderShapesInProgress();
 		// test if there's anything to export at all
 		if (!lc.getImage()) {
 			alert('Das Bild ist noch leer.');
@@ -144,6 +151,7 @@ var sketchModule = (function ()
 	 **/
 	function exportAs(format, name) 
 	{
+		renderShapesInProgress();
 		name += format; // add file extension
 		
 		if (format === '.png'){
@@ -178,6 +186,7 @@ var sketchModule = (function ()
 	 */
 	function getSnapshotAs(format)
 	{
+		renderShapesInProgress();
 		switch(format) {
 			case 'png':
 				return lc.getImage().toDataURL('image/png');
@@ -192,23 +201,27 @@ var sketchModule = (function ()
 		}
 	}
 	
-	/**
-	 * Get a name for a file. Either the user has previously entered a name, or we get a new one.
-	 * Returns null if the user was asked to enter a new name but cancelled.
-	 */
-	function getFileName(getNewName) {
-		if (!currentSnapshotName || getNewName) {
-			var name = prompt('Dateinamen eingeben:');
-			if (!name) {
-				return;
-			}
-			else {
-				currentSnapshotName = name;
-			}
-		}
-		return currentSnapshotName;
+	function getFileName() 
+	{
+		var name = prompt('Dateinamen eingeben:');
+		return name;
 	}
 	
+	/**
+	 * Repaint canvas with all shapes in progress (i.e. shapes that are currently being edited). 
+	 * This should be called before saving or exporting, otherwise shapes in progress will not be included.
+	 */
+	function renderShapesInProgress() {
+		lc.shapes.concat(lc.shapesInProgress);
+		if(lc.tool.currentShape) {
+			lc.shapes.push(lc.tool.currentShape);
+		}
+		lc.repaintLayer('main');
+	}	
+	
+	/**
+	 * Enable or disable the background image, without affecting the other shapes.
+	 */
 	var toggleBackground = (function() {
 		var bgImage = new Image(); 
 		bgImage.src = 'images/raster.jpg';
