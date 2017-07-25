@@ -13,7 +13,6 @@ var DragAndDrop = (function()
 {	
 	var enableDropzone = true;
 	var dropZoneHtml = '<div id="dropzoneOverlay"></div><span>Ziehen Sie ein Bild per Drag &amp; Drop hierher, um es anschlie&szlig;end in die Skizze einf&uuml;gen zu k&ouml;nnen</span>';
-	var defaultHeight = '200px'
 
 	var imageWrapper = null;
 	var offsetCorrection = null;
@@ -64,12 +63,13 @@ var DragAndDrop = (function()
 			.html(dropZoneHtml)
 			.removeClass('dropped')
 			.removeClass('dragover')
-			.css('height', defaultHeight)
+			.css('height', '')
 			.on('dragstart', setImageWrapper);
 		$('#dropzoneOverlay')
 			.html('')
 			.removeClass('dropped')
 			.removeClass('dragover');
+		$('#wrapper').css('display', '');
 		// register handlers
 		$('#dropzoneOverlay')
 			.on('dragenter', function(event){
@@ -176,6 +176,7 @@ var DragAndDrop = (function()
 			.removeClass('dragover')
 			.addClass('dropped')
 			.css('height', img.height) // TODO or set img height to fit into dropzone while preserving original size info
+		$('#wrapper').css('display', 'block'); // disable flex display
 	}
 	
 	/**

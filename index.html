@@ -18,7 +18,25 @@
 	<body>
 		<div class="lc-container">
 			<div id="lc"></div>
-			<div id="controls"></div>
+			<div id="wrapper">			
+				<div id="controls" style="display:none">
+					<label>Raster: 
+						<input type="checkbox" name="showBg" onchange="sketchModule.toggleBackground()">
+					</label>
+					<button type="button" class="controls" onclick="sketchModule.onLoad()">Laden</button>
+					<button type="button" class="controls" onclick="sketchModule.onSave()">Speichern unter</button>
+					<fieldset>
+						<button type="button" class="controls" onclick="sketchModule.onExport()">Exportieren</button>
+						<label class="controls">Format: 
+							<select name="format" size="1">
+								<option value=".png">PNG</option>
+								<option value=".svg">SVG</option>
+							</select>
+						</label>
+					</fieldset>
+				</div>
+				<!-- Dropzone -->
+			</div>
 			<input id="file-input" type="file" style="display: none;"/>
 		</div>
 	</body>

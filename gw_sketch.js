@@ -30,7 +30,7 @@ var sketchModule = (function ()
 	});
 	
 	/*
-	 * Initializes the literallyCanvas object, enables drag & drop functionality
+	 * Initializes the literallyCanvas object as well as all components (drag & drop, clipboard)
 	 * and inserts extra buttons for saving etc. if the tool is used as standalone.
 	 */
 	function init() 
@@ -38,17 +38,7 @@ var sketchModule = (function ()
 		lc = LC.init($('#lc')[0],lcConfig);
 		fileInput = $('#file-input');
 		if (isStandalone) {
-			var checked = showBackgroundInitially ? 'checked="checked"' : '';
-			$('<label>Raster anzeigen: <input type="checkbox" name="showBg" '+checked+'></label>').appendTo('#controls')
-				.on('change', toggleBackground);
-			$('<button type="button" class="controls">Laden</button>').appendTo('#controls')
-				.on('click', function(){fileInput.trigger('click');}); // forward to file input
-			$('<button type="button" class="controls">Speichern unter</button>').appendTo('#controls')
-				.on('click', onSave);
-			$('<button type="button" class="controls">Exportieren</button>').appendTo('#controls')
-				.on('click', onExport);
-			$('<label class="controls">Format: <select name="format" size="1"><option value=".png">PNG</option><option value=".svg">SVG</option></select></label>')
-				.appendTo('#controls');
+			$('#controls').show();
 		}
 
 		if (showBackgroundInitially) {
@@ -75,7 +65,7 @@ var sketchModule = (function ()
 			lc.saveShape(LC.createShape('Image', droppedImage));
 		};
 		if (enableDropzone) {
-			var dropzoneParent = $('.lc-container');
+			var dropzoneParent = $('#wrapper');
 			DragAndDrop.init(true, dropzoneParent, dropTarget, dropHandler)
 		} else {
 			DragAndDrop.init(false, null, dropTarget, dropHandler);
@@ -104,6 +94,13 @@ var sketchModule = (function ()
 		else {
 			alert('Keine Datei ausgewählt');
 		}
+	}
+	
+	/**
+	 * Simply forward the click to the file input.
+	 */
+	function onLoad() {
+		fileInput.trigger('click');
 	}
 	
 	/**
@@ -136,14 +133,6 @@ var sketchModule = (function ()
 		} else {
 			return;
 		}
-	}
-	
-	/**
-	 * Saves the current state of the canvas 
-	 */
-	function saveCurrentToLocalStorage() 
-	{
-		
 	}
 	
 	/**
@@ -243,7 +232,11 @@ var sketchModule = (function ()
 	})();
 	
 	return {
-		getSnapshotAs : getSnapshotAs
+		getSnapshotAs : getSnapshotAs,
+		onLoad : onLoad,
+		onSave : onSave,
+		onExport : onExport,
+		toggleBackground : toggleBackground
 	};
 })();
 

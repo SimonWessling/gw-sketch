@@ -1,17 +1,34 @@
+* {
+	margin:0;
+	padding:0;
+}
+
 .lc-container {
+	width: 80vh;
+	height: 100vh;
+	margin: 0 auto;
 	position: relative;
-	width: 550px;
-	margin: auto;
+	display: flex;
+    flex-direction: column;
+
 }
 .literally {
   	width: 100%;
-  	height: 80vh;
-	min-height: 600px;
+  	height: 70vh;
   	position: relative;
 }
+#wrapper {
+	display: flex;
+	flex-direction: column;
+    flex-grow: 1;
+}
 #controls {
-	display: table;
-	margin: auto;
+	margin: 0 auto;
+}
+#controls fieldset {
+    display: inline;
+    padding: 0;
+    border: 0;
 }
 button.controls {
 	margin: 5px 3px;
@@ -19,22 +36,20 @@ button.controls {
 }
 #dropzone {
 	position: relative;
-	margin: auto;
-	height: 20vh;
-	min-height: 200px;
-	line-height: 20vh;
+	margin: 0 auto;
+	margin-bottom: 5px;
+	flex-grow: 1;
+    display: flex;
+	min-height: 15vh;
+    align-items: center;
 	background-color: #e6e6e6;
 	border-radius: 5px;
 	border: 2px dashed;
 	border-color: #555;
 	padding: 10px;
-	text-align: center;
 }
 #dropzone span {
-	vertical-align: middle;
-	display: inline-block;
 	color: #444;
-	line-height: normal;
 }
 
 #dropzoneOverlay {
@@ -58,5 +73,12 @@ div #dropzone.dragover {
 div #dropzone.dropped {
 	background-color: #fff;
 	padding: 0;
-	line-height: 0;
+}
+
+@media only screen and (orientation: portrait) and (max-width: 1024px) {
+
+	.lc-container {	
+	width: 100%;
+	margin: 0;
+	}
 }
