@@ -3,15 +3,18 @@ var sketchModule = (function ()
 	/******************************** Configurable options *****************************************************/
 	var isStandalone = true;
 	var enableDropzone = true;
+	var enableImageCropping = true;
 	var showBackgroundInitially = 0;
 	var lcConfig = {
 					imageURLPrefix: 	'libs/literallycanvas-0.4.14/img',
 					backgroundColor:	'#fff',
 					toolbarPosition: 	'bottom',
-					// available tools: "Pencil", "Eraser", "Line", "Rectangle", "Ellipse", "Text", "Polygon", 
+					// 					available default tools: 
+					//					"Pencil", "Eraser", "Line", "Rectangle", "Ellipse", "Text", "Polygon", 
 					// 					"Pan", "Eyedropper", "SelectShape"
-					tools:				[LC.tools.Pencil, LC.tools.Eraser, LC.tools.Line, LC.tools.Rectangle,
-										 LC.tools.Ellipse, LC.tools.Polygon, LC.tools.Text, LC.tools.SelectShape
+					tools:				[LC.tools.Pencil, LC.tools.Eraser, LC.tools.Line, GW_CustomTools.DoubleArrow,
+										 LC.tools.Rectangle,LC.tools.Ellipse, LC.tools.Polygon, LC.tools.Text,
+										 LC.tools.Pan, LC.tools.SelectShape
 					      				],
 					      				defaultStrokeWidth: 3,
 					      				strokeWidths: 		[1, 2, 3, 5]
@@ -30,13 +33,14 @@ var sketchModule = (function ()
 	});
 	
 	/*
-	 * Initializes the literallyCanvas object as well as all components (drag & drop, clipboard)
+	 * Initializes the literallyCanvas object as well as all components (drag & drop, clipboard, image cropping)
 	 * and inserts extra buttons for saving etc. if the tool is used as standalone.
 	 */
 	function init() 
 	{
 		lc = LC.init($('#lc')[0],lcConfig);
 		fileInput = $('#file-input');
+		
 		if (isStandalone) {
 			$('#controls').show();
 		}
@@ -46,7 +50,7 @@ var sketchModule = (function ()
 		}
 		
 		// Set up listeners for the input element.
-		// Reset input before opening the file input dialog (on click), so that load is triggered
+		// Reset input before opening the file input dialog (on click), so that change a event is triggered
 		// even if the same file is selected again (because we always want to redraw the snapshot).
 		fileInput.on('click', function() {
 			ignoreOnChange = true;
@@ -64,19 +68,54 @@ var sketchModule = (function ()
 		var dropHandler = function(droppedImage) {
 			lc.saveShape(LC.createShape('Image', droppedImage));
 		};
-		if (enableDropzone) {
-			var dropzoneParent = $('#wrapper');
-			DragAndDrop.init(true, dropzoneParent, dropTarget, dropHandler)
-		} else {
-			DragAndDrop.init(false, null, dropTarget, dropHandler);
-		}
-		// disallow drop on other elements
-		/*document.body.ondragstart= preventDrop;
-		document.body.ondrop=preventDrop;
-		$('body').on('drop', preventDrop);
-		window.ondrop=preventDrop;
-		window.addEventListener("drop", preventDrop); */
+		var dropzoneParent = (enableDropzone) ? $('#wrapper') : null;
+		DragAndDrop.init(enableDropzone, enableImageCropping, dropzoneParent, dropTarget, dropHandler);
 		
+		// set up pasting from clipboard
+		ClipboardPaste.init('image', true, function(img){
+			if(img) {
+				DragAndDrop.setDropzoneImg(img);
+			}else {
+				alert('Einfügen nicht möglich. Haben Sie ein Bild in die Zwischenablage kopiert?');
+			}
+		});
+		var pasteButton = $('<button type="button" id="pastebutton" class="extraButton" onclick="ClipboardPaste.triggerPaste()"></button>');
+		if (enableDropzone) {
+			pasteButton.insertBefore('#dropzone');
+		} else {
+			pasteButton.addClass('no-dropzone').addClass('controls').prependTo('#controls');
+		}
+	}
+	
+	/**
+	 * Use this function to load a snapshot (that has previously been exported from this tool)
+	 * without any user interaction.
+	 */
+	function loadSnapshotFromFile(jsonFile)
+	{
+		IOHelpers.parseSketchFromFile(jsonFile,function(snapshot){
+			lc.loadSnapshot(snapshot); // render snapshot
+		});
+	}
+	
+	/**
+	 * Use this to get the current state of the canvas in the specified format
+	 */
+	function getSnapshotAs(format)
+	{
+		renderShapesInProgress();
+		switch(format) {
+			case 'png':
+				return lc.getImage().toDataURL('image/png');
+			case 'jpeg':
+				return lc.getImage().toDataURL('image/jpeg');
+			case 'svg':
+				return lc.getSVGString();
+			case 'json':
+				return JSON.stringify(lc.getSnapshot());
+			default:
+				return;
+		}
 	}
 	
 	/*
@@ -88,13 +127,36 @@ var sketchModule = (function ()
 		if(fileInput[0].files[0]){
 			IOHelpers.parseSketchFromFile(fileInput[0].files[0], function(snapshot){
 				lc.loadSnapshot(snapshot); // render snapshot
-				currentSnapshot = snapshot;
 			});
 		}
 		else {
 			alert('Keine Datei ausgewählt');
 		}
 	}
+	
+	/**
+	 * Enable or disable the background image, without affecting the other shapes.
+	 */
+	var onToggleBackground = (function() {
+		var bgImage = new Image(); 
+		bgImage.src = 'images/raster.jpg';
+		var bgShape = LC.createShape('Image', {x: 0, y: 0, image: bgImage, scale: 1});
+		var active = 0;
+		return function() {
+			if(active) {
+				//deactivate background
+				lc.backgroundShapes = [];
+				lc.repaintLayer('background');
+				active = (active+1)%2;
+			}else {
+				//activate
+				lc.backgroundShapes = [bgShape];
+				lc.repaintLayer('background');
+				active = (active+1)%2;
+			}
+		}
+	})();
+	
 	
 	/**
 	 * Simply forward the click to the file input.
@@ -119,7 +181,6 @@ var sketchModule = (function ()
 	
 	function onExport()
 	{
-		console.log(lc);
 		renderShapesInProgress();
 		// test if there's anything to export at all
 		if (!lc.getImage()) {
@@ -171,25 +232,8 @@ var sketchModule = (function ()
 	};
 
 	/**
-	 * Returns the current state of the canvas in the specified format
+	 * Encapsulates the logic of getting a name for the file.
 	 */
-	function getSnapshotAs(format)
-	{
-		renderShapesInProgress();
-		switch(format) {
-			case 'png':
-				return lc.getImage().toDataURL('image/png');
-			case 'jpeg':
-				return lc.getImage().toDataURL('image/jpeg');
-			case 'svg':
-				return lc.getSVGString();
-			case 'json':
-				return JSON.stringify(lc.getSnapshot());
-			default:
-				return;
-		}
-	}
-	
 	function getFileName() 
 	{
 		var name = prompt('Dateinamen eingeben:');
@@ -208,35 +252,16 @@ var sketchModule = (function ()
 		lc.repaintLayer('main');
 	}	
 	
-	/**
-	 * Enable or disable the background image, without affecting the other shapes.
-	 */
-	var toggleBackground = (function() {
-		var bgImage = new Image(); 
-		bgImage.src = 'images/raster.jpg';
-		var bgShape = LC.createShape('Image', {x: 0, y: 0, image: bgImage, scale: 1});
-		var active = 0;
-		return function() {
-			if(active) {
-				//deactivate background
-				lc.backgroundShapes = [];
-				lc.repaintLayer('background');
-				active = (active+1)%2;
-			}else {
-				//activate
-				lc.backgroundShapes = [bgShape];
-				lc.repaintLayer('background');
-				active = (active+1)%2;
-			}
-		}
-	})();
-	
 	return {
-		getSnapshotAs : getSnapshotAs,
+		/** Exports for standalone version (used by control buttons) **/
 		onLoad : onLoad,
 		onSave : onSave,
 		onExport : onExport,
-		toggleBackground : toggleBackground
+		onToggleBackground : onToggleBackground,
+		/** Exports for integrated version **/
+		init : init,
+		loadSnapshotFromFile : loadSnapshotFromFile,
+		getSnapshotAs : getSnapshotAs
 	};
 })();
 
