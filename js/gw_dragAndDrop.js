@@ -14,7 +14,7 @@
 var DragAndDrop = (function() 
 {	
 	var imageWrapper, offsetCorrection, dropzoneEnabled, croppingEnabled, dropzoneEmpty, startCropButton, finishCropButton;
-	var isIE = navigator.userAgent.toLowerCase().indexOf('Trident') > -1;
+	var isIE = navigator.userAgent.toLowerCase().indexOf('trident') > -1;
 	if (isIE) {
 		var dropzoneInstructions ='Ziehen Sie ein Bild per Drag &amp; Drop hierher oder f&uuml;gen Sie es über den Button aus der Zwischenablage ein';
 	}else {
