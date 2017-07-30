@@ -3,8 +3,7 @@
 This is a sketching tool that allows drawing to a canvas with various tools known from common photo editing software.
 It was developed as a first prototype for Gelsenwasser AG within ten days and is based on the Literally Canvas library.
 
-** Features **
-
+**Features**
 * Load a sketch to continue drawing, save it and export it as png or jpeg
 * Drag and drop image files to a dropzone to import them
 * Paste images from system clipboard via Ctrl+V in Chrome or via the paste button in Internet Explorer
@@ -12,7 +11,7 @@ It was developed as a first prototype for Gelsenwasser AG within ten days and is
 * Custom "double arrow" tool
 * Toggle background raster
 
-** Compatibility
+## Compatibility
 
 Tested in 
 * Google Chrome 59
@@ -27,11 +26,11 @@ Note: The Literally Canvas library had to be modified because of bugs. The follo
 - fixed alpha and saturation slider: due to a bug in IE 11, the onchange event is not fired on input elements of type range
   => introduce "onMouseUp" to handle slider change in IE, duplicate "onChange" handlers for "onMouseUp"
 
-### Use as standalone
+#### Use as standalone tool
 
 Open index.html in a browser and paint ahead ☺ Use the buttons to download, load and export the sketch (aka snapshot).
 
-### Integrate into another app
+#### Integrate into another app
 
 Open js/gw_sketch.js and set isStandalone to false.
 In this mode, the buttons are not shown. Interact with the tool via sketchModule.getSnapshotAs() to retrieve the sketch in different formats and
