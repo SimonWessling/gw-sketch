@@ -2,6 +2,7 @@
 
 This is a sketching tool that allows drawing to a canvas with various tools known from common photo editing software.
 It was developed as a first prototype for Gelsenwasser AG within ten days and is based on the Literally Canvas library.
+Look at the [Demo here](https://simonwessling.github.io/gw-sketch/)
 
 **Features**
 * Load a sketch to continue drawing, save it and export it as png or jpeg
