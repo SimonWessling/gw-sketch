@@ -79,11 +79,14 @@ var sketchModule = (function ()
 				alert('Einfügen nicht möglich. Haben Sie ein Bild in die Zwischenablage kopiert?');
 			}
 		});
-		var pasteButton = $('<button type="button" id="pastebutton" onclick="ClipboardPaste.triggerPaste()"></button>');
-		if (enableDropzone) {
-			pasteButton.prependTo('#dropzoneToolbar');
-		} else {
-			pasteButton.addClass('no-dropzone').addClass('controls').prependTo('#controls');
+		var isIE = navigator.userAgent.toLowerCase().indexOf('trident') > -1;
+		if (isIE) { // add paste button in IE
+			var pasteButton = $('<button type="button" id="pastebutton" onclick="ClipboardPaste.triggerPaste()"></button>');
+			if (enableDropzone) {
+				pasteButton.prependTo('#dropzoneToolbar');
+			} else {
+				pasteButton.addClass('no-dropzone').addClass('controls').prependTo('#controls');
+			}
 		}
 	}
 	

@@ -1,10 +1,11 @@
 * {
 	margin:0;
 	padding:0;
+	font-family: sans-serif;
 }
 
 .lc-container {
-	width: 70vh;
+	width: 75vh;
 	height: 100vh;
 	min-width: 400px;
 	max-width: 1000px;
@@ -30,7 +31,7 @@
     flex-grow: 1;
 }
 #controls {
-	margin: 5px auto;
+	margin: 5px auto 10px;
 }
 #controls fieldset {
     display: inline;
@@ -42,8 +43,9 @@ button.controls {
 	padding: 3px;
 }
 #dropzoneToolbar {
+	height: 32px;
 	margin-left: 5px;
-	margin-bottom: -6px;
+	margin-bottom: -2px;
 	position: relative;
     z-index: 100;
 }

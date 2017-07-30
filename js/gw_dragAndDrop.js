@@ -1,4 +1,4 @@
-/**
+﻿/**
  * This module sets up drag and drop support for image file import.
  * If the dropzone is enabled, it inserts an element onto which an image file can be dropped and thereby 
  * inserted into the application. This dropzone is used as a temporary holding area, from which the image 
@@ -13,9 +13,16 @@
  */
 var DragAndDrop = (function() 
 {	
-	var dropZoneHtml = '<div id="dropzoneOverlay"></div><span>'+
-	'Ziehen Sie ein Bild per Drag &amp; Drop hierher, um es anschlie&szlig;end in die Skizze einf&uuml;gen zu k&ouml;nnen</span>';
 	var imageWrapper, offsetCorrection, dropzoneEnabled, croppingEnabled, dropzoneEmpty, startCropButton, finishCropButton;
+	var isIE = navigator.userAgent.toLowerCase().indexOf('Trident') > -1;
+	if (isIE) {
+		var dropzoneInstructions ='Ziehen Sie ein Bild per Drag &amp; Drop hierher oder f&uuml;gen Sie es über den Button aus der Zwischenablage ein';
+	}else {
+		var dropzoneInstructions ='Ziehen Sie ein Bild per Drag &amp; Drop hierher oder f&uuml;gen Sie es per Strg+V aus der Zwischenablage ein';
+	}
+	dropzoneInstructions +=  '. Anschlie&szlig;end k&ouml;nnen Sie es in die Skizze schieben.';
+	var dropZoneHtml = '<div id="dropzoneOverlay"></div><span>' + dropzoneInstructions + '</span>';	
+
 	
 	/**
 	 * Sets up drag and drop functionality. See description above.
