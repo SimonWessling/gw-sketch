@@ -1,7 +1,22 @@
 # GWSketch
 
-This is a basic sketching tool that allows drawing to a canvas with various tools known from common photo editing software.
-It is based on the Literally Canvas library.
+This is a sketching tool that allows drawing to a canvas with various tools known from common photo editing software.
+It was developed as a first prototype for Gelsenwasser AG within ten days and is based on the Literally Canvas library.
+
+** Features **
+
+* Load a sketch to continue drawing, save it and export it as png or jpeg
+* Drag and drop image files to a dropzone to import them
+* Paste images from system clipboard via Ctrl+V in Chrome or via the paste button in Internet Explorer
+* Crop images in the dropzone
+* Custom "double arrow" tool
+* Toggle background raster
+
+** Compatibility
+
+Tested in 
+* Google Chrome 59
+* Internet Explorer 11
 
 ## Installation
 

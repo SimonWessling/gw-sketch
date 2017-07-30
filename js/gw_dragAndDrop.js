@@ -2,25 +2,26 @@
  * This module sets up drag and drop support for image file import.
  * If the dropzone is enabled, it inserts an element onto which an image file can be dropped and thereby 
  * inserted into the application. This dropzone is used as a temporary holding area, from which the image 
- * can subsequently be dragged to a different element, the target element.
- * An image cropping feature can also be enabled, see the respective source (crop.js) code for a description.
- * The advantage of the dropzone is that the exact coordinates of the subsequent drop on the target can be
- * calculated (see onTargetDrop() for a more detailed explanation).
- * The dropzone can be enabled and disabled via init().
- * The container to insert the dropzone into as well as the target element and a function to handle the drop on 
- * the target element can also be configured via init().
+ * can subsequently be dragged to a different element, the target element. The dropzone can be enabled and 
+ * disabled via init().
+ * The dropzone contains a toolbar that is shown when an image is available. Tools can be added to this toolbar
+ * by adding them in the function showHiddenDropzoneTools();
+ * An image cropping feature is already attached, this can also be enabled and disabled.
+ * Besides offering the possibility of attaching tools to it, the advantage of the dropzone is that the exact 
+ * coordinates of the subsequent drop on the target can be calculated (see onTargetDrop() for a more detailed explanation).
+
  */
 var DragAndDrop = (function() 
 {	
 	var dropZoneHtml = '<div id="dropzoneOverlay"></div><span>'+
 	'Ziehen Sie ein Bild per Drag &amp; Drop hierher, um es anschlie&szlig;end in die Skizze einf&uuml;gen zu k&ouml;nnen</span>';
-	var imageWrapper, offsetCorrection, dropzoneEnabled, croppingEnabled, dropzoneEmpty;
+	var imageWrapper, offsetCorrection, dropzoneEnabled, croppingEnabled, dropzoneEmpty, startCropButton, finishCropButton;
 	
 	/**
 	 * Sets up drag and drop functionality. See description above.
 	 * Parameters:
 	 * 	 enableDropzone  	Whether or not to display and set up the dropzone
-	 *	 enableCropping		Whether or not to enable imag cropping after an image is dropped
+	 *	 enableCropping		Whether or not to display the image cropping button after an image is dropped.
 	 * 	 dropzoneContainer 	A jQuery element to insert the dropzone into. Pass null, if dropzone disabled
 	 * 	 dropTarget			A jQuery element onto which images shall be droppable
 	 * 	 targetDropHandler	A handler to define what to do when the image is dropped onto dropTarget
@@ -35,10 +36,7 @@ var DragAndDrop = (function()
 	{
 		dropzoneEnabled = enableDropzone;
 		croppingEnabled = enableCropping;
-		if (dropzoneEnabled){
-			dropzoneContainer.append('<div id="dropzone"></div>');
-			initDropzone();
-		}
+
 		// register the handler for the target drop event
 		dropTarget
 			.on('dragover', onDragover)
@@ -46,8 +44,48 @@ var DragAndDrop = (function()
 				event.preventDefault();
 				onTargetDrop(event, targetDropHandler);
 			});
+
 		// disable drop for other elements
 		onBodyDropPreventDefault();
+
+		// enable dropzone if necessary
+		if (dropzoneEnabled){
+			dropzoneContainer.append('<div id="dropzoneToolbar"></div><div id="dropzone"></div>');
+
+			// enable cropping feature if necessary
+			if(croppingEnabled){
+				initCropperTool();
+			}
+			initDropzone();
+		}
+	}
+
+	/**
+	 *	Initializes the buttons to start and end the cropping tool.
+	 */
+	function initCropperTool()
+	{
+		startCropButton = $('<button type="button" id="startCropButton" </button>')
+			.on('click', function() {
+				Cropper.init($('#croppable'));
+				Cropper.startCropper();
+				finishCropButton.show();
+			})
+			.appendTo('#dropzoneToolbar')
+
+		finishCropButton = $('<button type="button" id="finishCropButton"</button>')
+			.on('click', function(){
+				Cropper.finishCropper(function(croppedImage) {
+					var newImage = new Image();
+					newImage.src = croppedImage.dataURL;
+					newImage.onload = function(loadevent) {
+						setDropzoneImg(loadevent.target);
+					};
+				});
+				Cropper.destroy(); // Cropper needs to be removed entirely to make the image draggable again
+				$(this).hide();})
+			.insertAfter('#startCropButton')
+			.hide();
 	}
 	
 	/**
@@ -84,12 +122,10 @@ var DragAndDrop = (function()
 				event.preventDefault();
 				onDropzoneDrop(event);
 			});
-		// TODO refactor: fire custom 'dropzone reset' event to inform other tools
-		// rather than invoking methods on dependncies
 		if (croppingEnabled) {
 			Cropper.destroy();
-			$('#startCropButton').remove();
 		}
+		hideDropzoneTools();
 		dropzoneEmpty = true;
 	}
 	
@@ -175,6 +211,7 @@ var DragAndDrop = (function()
 					// so that the image dimensions are set
 					img.onload = function() {
 						onFinish(img);
+						img.onload = null;
 					}
 				};
 				// start reading in
@@ -197,45 +234,34 @@ var DragAndDrop = (function()
 		$('#dropzone')
 			.removeClass('dragover')
 			.addClass('dropped')
-			.css('height', img.height) // TODO or set img height to fit into dropzone while preserving original size info
+			.css('height', img.height) // TODO alternative: set img height to fit into dropzone while preserving original size info?
 		$('#wrapper').css('display', 'block'); // disable flex display
 		
-		// TODO fire custom 'dropzone image changed' or 'dropzone now has image' event
-		// This decouples the tools (such as cropper) from the dropzone and facilitates integration of other tools,
-		// because other components only need to register (i.e. cropping tool) and can define the handling themselves.
-		// Idea: implement toggleDropzoneEmpty that fires the events, call in setDropzoneImg and initDropzone.
-		if (croppingEnabled && dropzoneEmpty) {
-			startCropButton = $('<button type="button" id="startCropButton" class="extraButton"></button>')
-				.on('click', function() {
-					Cropper.init($(img));
-				})
-				.insertAfter('#pastebutton');
+		if (croppingEnabled) {
+			img.id = 'croppable';
 		}
 		dropzoneEmpty = false;
+		showHiddenDropzoneTools();
 	}
-	
-		var toggleCropper = (function() {
-		var active = 0;	
-		// x, y: top left corner coordinates; x1, x2: bottom right corner; w,h: selection dimensions
-		//var coordinates = {x:0, y:0, x1:target.width(), x2:target.height(), w:target.width(), h:target.height()};
-		var coordinates;
-		var setCoordinates = function(c) {
-			coordinates = c;
+	/**
+	 * This function is called when an image is set on the dropzone. Place buttons for further tools here, if they shall only be
+	 * available if an image is set.
+	 */
+	function showHiddenDropzoneTools() {
+		if (croppingEnabled) {
+			startCropButton.show();
 		}
-		return function() {
-			if(!active) {
-				//activate
-				enable();
-				active = (active+1)%2;
-			}else {
-				//crop image accordingly, then disable
-				crop(target[0], coordinates);
-				disable();
-				active = (active+1)%2;
-			}
-		}
-	})();
-	
+	}
+
+	/**
+	 * Called when the dropzone is reset, i.e. no image is present anymore.
+	 */
+	function hideDropzoneTools() {
+		if (croppingEnabled) {
+			startCropButton.hide();
+		};
+	}
+
 	/**
 	 * Wrap the image that is currently dragged away from the dropzone with
 	 * the coordinates where it was grabbed (relative to its top left corner).
