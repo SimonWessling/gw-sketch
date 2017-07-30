@@ -79,9 +79,9 @@ var sketchModule = (function ()
 				alert('Einfügen nicht möglich. Haben Sie ein Bild in die Zwischenablage kopiert?');
 			}
 		});
-		var pasteButton = $('<button type="button" id="pastebutton" class="extraButton" onclick="ClipboardPaste.triggerPaste()"></button>');
+		var pasteButton = $('<button type="button" id="pastebutton" onclick="ClipboardPaste.triggerPaste()"></button>');
 		if (enableDropzone) {
-			pasteButton.insertBefore('#dropzone');
+			pasteButton.prependTo('#dropzoneToolbar');
 		} else {
 			pasteButton.addClass('no-dropzone').addClass('controls').prependTo('#controls');
 		}
