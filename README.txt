@@ -1,7 +1,7 @@
 # GWSketch
 
-This is a sketching tool that allows drawing to a canvas with various tools known from common photo editing software.
-It was developed as a first prototype for Gelsenwasser AG within ten days and is based on the Literally Canvas library.
+This is a basic sketching tool that allows drawing to a canvas with various tools known from common photo editing software.
+It is based on the Literally Canvas library.
 
 ** Features **
 
@@ -54,6 +54,9 @@ The GW_CustomTools module in gw_customTools.js contains tools that extend the Li
 Implement new tools in this file (see [Literally Canvas documentation](http://literallycanvas.com/api/tools.html) for the API) and add them to the 
 loaded tools in the lcConfig property in gw_sketch.js.
 
+The dropzone contains a toolbar that holds tools that shall only be available when an image is available in the dropzone (e.g. the image cropping tool).
+New tools can be added here by inserting them in showHiddenDropzoneTools() in js/gw_dragAndDrop.js
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
@@ -61,5 +64,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Author
 
 Simon Wessling
-
 
