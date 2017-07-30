@@ -179,12 +179,14 @@ var DragAndDrop = (function()
 			});
 		}else {
 			alert('Bitte hier nur Bilder einfügen');
-			$('#dropzone')
-				.removeClass('dropped')
-				.removeClass('dragover')
-			$('#dropzoneOverlay')
-				.removeClass('dropped')
-				.removeClass('dragover');
+			if (dropzoneEmpty) {		
+				$('#dropzone')
+					.removeClass('dropped')
+					.removeClass('dragover')
+				$('#dropzoneOverlay')
+					.removeClass('dropped')
+					.removeClass('dragover');
+				}
 			}
 	}
 	
@@ -241,6 +243,7 @@ var DragAndDrop = (function()
 			img.id = 'croppable';
 		}
 		dropzoneEmpty = false;
+		hideDropzoneTools(); // in case a tool was interrupted by setDropzoneImg
 		showHiddenDropzoneTools();
 	}
 	/**
@@ -257,9 +260,8 @@ var DragAndDrop = (function()
 	 * Called when the dropzone is reset, i.e. no image is present anymore.
 	 */
 	function hideDropzoneTools() {
-		if (croppingEnabled) {
-			startCropButton.hide();
-		};
+		startCropButton.hide();
+		finishCropButton.hide();
 	}
 
 	/**

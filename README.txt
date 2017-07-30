@@ -1,7 +1,7 @@
 # GWSketch
 
-This is a basic sketching tool that allows drawing to a canvas with various tools known from common photo editing software.
-It is based on the Literally Canvas library.
+This is a sketching tool that allows drawing to a canvas with various tools known from common photo editing software.
+It was developed as a first prototype for Gelsenwasser AG within ten days and is based on the Literally Canvas library.
 
 ** Features **
 
