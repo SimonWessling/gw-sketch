@@ -2,10 +2,10 @@
 
 This is a sketching tool that allows drawing to a canvas with various tools known from common photo editing software.
 It was developed as a first prototype for Gelsenwasser AG within ten days and is based on the Literally Canvas library.
-Look at the [Demo here](https://simonwessling.github.io/gw-sketch/)
+Look at the [Demo here](https://simonwessling.github.io/gw-sketch/).
 
 **Features**
-* Load a sketch to continue drawing, save it and export it as png or jpeg
+* Load a sketch to continue drawing, save it and export it as png or svg
 * Drag and drop image files to a dropzone to import them
 * Paste images from system clipboard via Ctrl+V in Chrome or via the paste button in Internet Explorer
 * Crop images in the dropzone
